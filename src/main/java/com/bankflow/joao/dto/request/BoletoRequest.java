@@ -12,7 +12,6 @@ public record BoletoRequest(
         @NotNull Long contaId,
         @NotBlank String codigoBarras,
         @NotNull @PositiveOrZero BigDecimal valor,
-        @NotNull LocalDate vencimento,
-        @NotNull StatusBoleto status
+        @NotNull LocalDate vencimento
 ) {
 }
