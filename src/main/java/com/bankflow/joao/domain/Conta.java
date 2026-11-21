@@ -44,6 +44,11 @@ public class Conta {
     @Column(nullable = false, name = "criada_em")
     private Instant criadaEm;
 
+    @PrePersist
+    public void criada() {
+        this.criadaEm = Instant.now();
+    }
+
     public Conta() {
     }
 

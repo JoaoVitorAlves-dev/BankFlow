@@ -29,6 +29,11 @@ public class ChavePix {
     @Column(nullable = false, name = "criada_em")
     private Instant criadaEm;
 
+    @PrePersist
+    public void instant() {
+        this.criadaEm = Instant.now();
+    }
+
     public ChavePix() {
     }
 
