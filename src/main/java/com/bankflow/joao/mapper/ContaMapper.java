@@ -7,8 +7,6 @@ import com.bankflow.joao.dto.request.ContaRequest;
 import com.bankflow.joao.dto.response.ContaResponse;
 import lombok.experimental.UtilityClass;
 
-import java.util.UUID;
-
 @UtilityClass
 public class ContaMapper {
 
