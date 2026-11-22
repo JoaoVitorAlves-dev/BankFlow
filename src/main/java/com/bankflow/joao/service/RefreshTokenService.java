@@ -26,7 +26,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public RefreshToken criarERotacionar(Usuario usuario) {
+    public RefreshToken criar(Usuario usuario) {
         refreshTokenRepository.deleteByUsuario(usuario);
 
         RefreshToken rt = new RefreshToken();
@@ -37,7 +37,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public RefreshToken validarToken(String token) {
+    public RefreshToken validarERotacionar(String token) {
         RefreshToken atual = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -46,7 +46,7 @@ public class RefreshTokenService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        return criarERotacionar(atual.getUsuario());
+        return criar(atual.getUsuario());
     }
 
     @Transactional
