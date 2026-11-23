@@ -35,8 +35,8 @@ public class InvestimentoService {
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Conta desativada ou excluida.");
+        if (conta.getStatus() != StatusConta.ATIVA || conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "A conta está desativada ou o usuário não está ativo.");
         }
 
         Investimento entity = InvestimentoMapper.toEntity(req, conta);
@@ -53,10 +53,10 @@ public class InvestimentoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!conta.getUsuario().getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para realizar aplicações nesta conta.");
         }
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if (conta.getStatus() != StatusConta.ATIVA || conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "A conta está desativada ou o usuário não está ativo.");
         }
         if (conta.getSaldo().compareTo(req.valorAplicado()) < 0) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Saldo insuficiente para realizar a aplicação.");
@@ -76,20 +76,21 @@ public class InvestimentoService {
 
     public Page<InvestimentoResponse> listarInvestimentoGerentes(Authentication auth, Pageable pageable) {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
+
         return investimentoRepository.findAllByContaAgenciaId(gerente.getAgencia().getId(), pageable)
                 .map(InvestimentoMapper::toDTO);
     }
 
     public InvestimentoResponse atualizar(Long id, InvestimentoRequest req) {
         Investimento investimento = investimentoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Investimento não encontrado."));
 
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!investimento.getConta().equals(conta)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O investimento não pertence à conta informada.");
         }
         if (conta.getSaldo().compareTo(req.valorAplicado()) < 0) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Saldo insuficiente para realizar a aplicação.");
@@ -105,16 +106,17 @@ public class InvestimentoService {
 
     public void deletar(Long id) {
         Investimento investimento = investimentoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Investimento não encontrado."));
+
         investimentoRepository.delete(investimento);
     }
 
     public void deleteInvestimentoCliente(Long id, Authentication auth) {
         Investimento investimento = investimentoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Investimento não encontrado."));
 
         if (!investimento.getConta().getUsuario().getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para excluir este investimento.");
         }
 
         investimentoRepository.delete(investimento);
