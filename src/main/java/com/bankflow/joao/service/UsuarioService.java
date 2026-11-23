@@ -47,7 +47,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse registrar(RegisterRequest req) {
         if (usuarioRepository.existsByEmail(req.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado.");
         }
 
         Usuario usuario = new Usuario();
@@ -71,13 +71,13 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse atualizar(Long id, RegisterRequest req, Authentication auth) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
-        if (usuario.getStatus().equals(StatusUsuario.BLOQUEADO) || usuario.getStatus().equals(StatusUsuario.ENCERRADO)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+        if (usuario.getStatus() == StatusUsuario.BLOQUEADO || usuario.getStatus() == StatusUsuario.ENCERRADO) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Não é possível atualizar um usuário bloqueado ou encerrado.");
         }
         if (!usuario.getEmail().equals(auth.getName()) || !req.email().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para atualizar este usuário ou alterar o e-mail para outro endereço.");
         }
 
         usuario.setNome(req.nome());
@@ -92,13 +92,13 @@ public class UsuarioService {
     @Transactional
     public void encerrar(Long id, Authentication auth) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
-        if (!usuario.getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+        if (usuario.getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Apenas usuários ativos podem encerrar a conta.");
         }
         if (!usuario.getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para encerrar esta conta.");
         }
 
         usuario.setStatus(StatusUsuario.ENCERRADO);
