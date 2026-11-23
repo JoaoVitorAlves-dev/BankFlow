@@ -31,7 +31,7 @@ public class AgenciaService {
 
     public AgenciaResponse atualizar(Long id, AgenciaRequest req) {
         Agencia agencia = agenciaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro não encontrado."));
 
         agencia.setEstado(req.estado());
         agencia.setCodigo(req.codigo());
@@ -43,7 +43,7 @@ public class AgenciaService {
 
     public void deletar(Long id) {
         Agencia agencia = agenciaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro não encontrado."));
         agenciaRepository.delete(agencia);
     }
 
