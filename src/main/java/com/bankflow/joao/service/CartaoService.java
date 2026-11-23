@@ -8,7 +8,6 @@ import com.bankflow.joao.domain.roles.StatusUsuario;
 import com.bankflow.joao.dto.request.CartaoRequest;
 import com.bankflow.joao.dto.response.CartaoResponse;
 import com.bankflow.joao.mapper.CartaoMapper;
-import com.bankflow.joao.mapper.ContaMapper;
 import com.bankflow.joao.repository.CartaoRepository;
 import com.bankflow.joao.repository.ContaRepository;
 import com.bankflow.joao.repository.GerenteRepository;
@@ -48,7 +47,7 @@ public class CartaoService {
         if (!conta.getAgencia().equals(gerente.getAgencia())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "A conta não pertence à sua agência.");
         }
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (conta.getStatus() != StatusConta.ATIVA || conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -73,7 +72,7 @@ public class CartaoService {
         if (!cartao.getConta().equals(conta)) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O cartão informado não pertence a esta conta.");
         }
-        if (!cartao.getAtivo() || !cartao.getConta().getStatus().equals(StatusConta.ATIVA) || !cartao.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (!cartao.getAtivo() || cartao.getConta().getStatus() != StatusConta.ATIVA || cartao.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Operação não permitida: cartão, conta ou usuário inativo.");
         }
 
@@ -155,7 +154,7 @@ public class CartaoService {
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
-        if (!conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO) || !conta.getStatus().equals(StatusConta.ATIVA)) {
+        if (conta.getUsuario().getStatus() != StatusUsuario.ATIVO || conta.getStatus() != StatusConta.ATIVA) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -173,8 +172,8 @@ public class CartaoService {
         if (!cartao.getConta().equals(conta)) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O cartão informado não pertence a esta conta.");
         }
-        if (!cartao.getAtivo() || !cartao.getConta().getStatus().equals(StatusConta.ATIVA)
-                || !cartao.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (!cartao.getAtivo() || cartao.getConta().getStatus() != StatusConta.ATIVA
+                || cartao.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Operação não permitida: cartão, conta ou usuário inativo.");
         }
 
@@ -208,5 +207,4 @@ public class CartaoService {
         cartao.setAtivo(false);
         cartaoRepository.delete(cartao);
     }
-
 }

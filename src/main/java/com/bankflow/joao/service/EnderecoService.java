@@ -35,7 +35,7 @@ public class EnderecoService {
 
     public EnderecoResponse criar(EnderecoRequest req) {
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
         Endereco entity = EnderecoMapper.toEntity(req, usuario);
         return EnderecoMapper.toDTO(enderecoRepository.save(entity));
@@ -43,19 +43,19 @@ public class EnderecoService {
 
     public EnderecoResponse criarProprio(EnderecoRequest req, Authentication auth) {
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
         if (!usuario.getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este recurso.");
         }
 
         Endereco entity = EnderecoMapper.toEntity(req, usuario);
         return EnderecoMapper.toDTO(enderecoRepository.save(entity));
     }
-    
+
     public EnderecoResponse atualizar(Long id, EnderecoRequest req) {
         Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado."));
 
         endereco.setRua(req.rua());
         endereco.setCep(req.cep());
@@ -67,13 +67,13 @@ public class EnderecoService {
 
     public EnderecoResponse atualizarProprio(Long id, EnderecoRequest req, Authentication auth) {
         Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado."));
 
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
         if (!endereco.getUsuario().getEmail().equals(auth.getName()) || !usuario.getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este recurso.");
         }
 
         endereco.setEstado(req.estado());
@@ -86,10 +86,10 @@ public class EnderecoService {
 
     public void deletarProprio(Long id, Authentication auth) {
         Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado."));
 
         if (!endereco.getUsuario().getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este recurso.");
         }
 
         enderecoRepository.delete(endereco);
@@ -97,7 +97,7 @@ public class EnderecoService {
 
     public void deletar(Long id) {
         Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado."));
         enderecoRepository.delete(endereco);
     }
 

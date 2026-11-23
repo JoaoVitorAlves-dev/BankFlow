@@ -43,7 +43,7 @@ public class BoletoService {
         if (!conta.getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Conflito de dados.");
         }
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (conta.getStatus() != StatusConta.ATIVA || conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -58,7 +58,7 @@ public class BoletoService {
         if (!boleto.getConta().getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este recurso.");
         }
-        if (boleto.getStatus().equals(StatusBoleto.EMITIDO)) {
+        if (boleto.getStatus() == StatusBoleto.EMITIDO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto já foi emitido.");
         }
 
@@ -80,7 +80,7 @@ public class BoletoService {
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (conta.getStatus() != StatusConta.ATIVA || conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -98,7 +98,7 @@ public class BoletoService {
         if (!boleto.getConta().equals(conta)) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto informado não pertence a esta conta.");
         }
-        if (!boleto.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO) || !boleto.getConta().getStatus().equals(StatusConta.ATIVA)) {
+        if (boleto.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO || boleto.getConta().getStatus() != StatusConta.ATIVA) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -113,7 +113,7 @@ public class BoletoService {
         Boleto boleto = boletoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Boleto não encontrado."));
 
-        if (boleto.getStatus().equals(StatusBoleto.EMITIDO)) {
+        if (boleto.getStatus() == StatusBoleto.EMITIDO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto já foi emitido.");
         }
 
