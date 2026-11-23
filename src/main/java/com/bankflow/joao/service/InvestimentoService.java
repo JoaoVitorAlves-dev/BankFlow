@@ -33,7 +33,7 @@ public class InvestimentoService {
 
     public InvestimentoResponse criar(InvestimentoRequest req) {
         Conta conta = contaRepository.findById(req.contaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Conta desativada ou excluida.");
@@ -50,7 +50,7 @@ public class InvestimentoService {
 
     public InvestimentoResponse criarInvestimentoCliente(InvestimentoRequest req, Authentication auth) {
         Conta conta = contaRepository.findById(req.contaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!conta.getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -59,7 +59,7 @@ public class InvestimentoService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         if (conta.getSaldo().compareTo(req.valorAplicado()) < 0) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Saldo insuficiente para realizar a aplicação.");
         }
 
         Investimento entity = InvestimentoMapper.toEntity(req, conta);
@@ -86,7 +86,7 @@ public class InvestimentoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         Conta conta = contaRepository.findById(req.contaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!investimento.getConta().equals(conta)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
