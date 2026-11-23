@@ -33,7 +33,7 @@ public class GerenteService {
 
     public GerenteResponse visualizarConta(Authentication auth) {
         return GerenteMapper.toDTO(gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado.")));
     }
 
     public Page<GerenteResponse> visualizar(Pageable pageable) {
@@ -42,12 +42,12 @@ public class GerenteService {
 
     public GerenteResponse criar(GerenteRequest req) {
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
         Agencia agencia = agenciaRepository.findById(req.agenciaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agência não encontrada."));
 
-        if (!usuario.getRole().equals(Role.CLIENTE) || !usuario.getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        if (usuario.getRole() != Role.CLIENTE || usuario.getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O usuário precisa estar ativo e possuir perfil de cliente.");
         }
 
         Gerente entity = GerenteMapper.toEntity(req, usuario, agencia);
@@ -56,19 +56,19 @@ public class GerenteService {
 
     public GerenteResponse atualizar(Long id, GerenteRequest req) {
         Gerente gerente = gerenteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
 
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
         Agencia agencia = agenciaRepository.findById(req.agenciaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agência não encontrada."));
 
-        if (!usuario.getRole().equals(Role.CLIENTE) || !usuario.getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+        if (usuario.getRole() != Role.CLIENTE || usuario.getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.GONE, "O usuário não está ativo ou não possui perfil de cliente.");
         }
 
         if (!gerente.getAtivo()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Não é possível atualizar um gerente inativo.");
         }
 
         gerente.setUsuario(usuario);
@@ -80,10 +80,10 @@ public class GerenteService {
 
     public void desativar(Long id) {
         Gerente gerente = gerenteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
 
         if (!gerente.getAtivo()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O gerente já está inativo.");
         }
 
         gerente.setAtivo(false);
@@ -92,10 +92,10 @@ public class GerenteService {
 
     public void deletar(Long id) {
         Gerente gerente = gerenteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
 
         if (!gerente.getAtivo()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Não é possível excluir um gerente inativo.");
         }
 
         gerenteRepository.delete(gerente);
