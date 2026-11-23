@@ -41,7 +41,7 @@ public class ChavePixService {
 
         ChavePix entity = ChavePixMapper.toEntity(req, conta);
 
-        if (!entity.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO) || !entity.getConta().getStatus().equals(StatusConta.ATIVA)) {
+        if (entity.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO || entity.getConta().getStatus() != StatusConta.ATIVA) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -54,8 +54,8 @@ public class ChavePixService {
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
-        if (!conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO) || !conta.getStatus().equals(StatusConta.ATIVA)
-        || !chavePix.getConta().getStatus().equals(StatusConta.ATIVA) || !chavePix.getAtiva()) {
+        if (conta.getUsuario().getStatus() != StatusUsuario.ATIVO || conta.getStatus() != StatusConta.ATIVA
+        || chavePix.getConta().getStatus() != StatusConta.ATIVA || !chavePix.getAtiva()) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta, usuário ou chave Pix inativos.");
         }
 
@@ -70,8 +70,8 @@ public class ChavePixService {
         ChavePix chavePix = chavePixRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ChavePix não encontrada."));
 
-        if (chavePix.getAtiva() || !chavePix.getConta().getStatus().equals(StatusConta.ATIVA)
-                || !chavePix.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (chavePix.getAtiva() || chavePix.getConta().getStatus() != StatusConta.ATIVA
+                || chavePix.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Chave Pix ativa ou conta/usuário inativos.");
         }
 
@@ -82,8 +82,8 @@ public class ChavePixService {
         ChavePix chavePix = chavePixRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ChavePix não encontrada."));
 
-        if (!chavePix.getAtiva() || !chavePix.getConta().getStatus().equals(StatusConta.ATIVA)
-                || !chavePix.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (!chavePix.getAtiva() || chavePix.getConta().getStatus() != StatusConta.ATIVA
+                || chavePix.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Chave Pix, conta ou usuário inativos.");
         }
 
@@ -107,7 +107,7 @@ public class ChavePixService {
 
         ChavePix entity = ChavePixMapper.toEntity(req, conta);
 
-        if (!entity.getConta().getStatus().equals(StatusConta.ATIVA) || !entity.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (entity.getConta().getStatus() != StatusConta.ATIVA || entity.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -124,8 +124,8 @@ public class ChavePixService {
         if (!chavePix.getConta().getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta chave Pix.");
         }
-        if (!chavePix.getConta().getStatus().equals(StatusConta.ATIVA) || !chavePix.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)
-                || !conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (chavePix.getConta().getStatus() != StatusConta.ATIVA || chavePix.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO
+                || conta.getStatus() != StatusConta.ATIVA || conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta, usuário ou chave Pix inativos.");
         }
 
@@ -143,7 +143,7 @@ public class ChavePixService {
         if (!chavePix.getConta().getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta chave Pix.");
         }
-        if (!chavePix.getConta().getStatus().equals(StatusConta.ATIVA) || !chavePix.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (chavePix.getConta().getStatus() != StatusConta.ATIVA || chavePix.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
@@ -158,7 +158,7 @@ public class ChavePixService {
         if (!chavePix.getConta().getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
-        if (chavePix.getAtiva() || !chavePix.getConta().getStatus().equals(StatusConta.ATIVA) || !chavePix.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
+        if (chavePix.getAtiva() || chavePix.getConta().getStatus() != StatusConta.ATIVA || chavePix.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Chave Pix ativa ou conta/usuário inativos.");
         }
 

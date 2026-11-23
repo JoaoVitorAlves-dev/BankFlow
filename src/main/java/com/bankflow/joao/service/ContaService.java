@@ -38,28 +38,28 @@ public class ContaService {
 
     public Page<ContaResponse> visualizarClientesGerenteAgencia(Authentication auth, Pageable pageable) {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado"));
         return contaRepository.findAllByAgenciaId(gerente.getAgencia().getId(), pageable);
     }
 
     public ContaResponse verConta(Authentication auth) {
         return ContaMapper.toDTO(contaRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrado")));
     }
 
     public ContaResponse criarGerentePermission(ContaRequest req, Authentication auth) {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado"));
         Agencia agencia = gerente.getAgencia();
 
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
 
         if (!usuario.getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Usuário inativo.");
         }
         if (!usuario.getRole().equals(Role.CLIENTE)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O usuário informado não possui o perfil de cliente.");
         }
 
         Conta entity = ContaMapper.toEntity(req, agencia, usuario);
@@ -69,25 +69,29 @@ public class ContaService {
 
     public ContaResponse atualizarGerentePermission(Long id, ContaRequest req, Authentication auth) {
         Conta conta = contaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrado"));
 
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado"));
 
         if (!conta.getAgencia().equals(gerente.getAgencia())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O gerente não possui acesso a esta agência.");
         }
-        if (!conta.getStatus().equals(StatusConta.ATIVA)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+
+        if (conta.getStatus() != StatusConta.ATIVA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A conta não está ativa.");
         }
-        if (!conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        if (conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário vinculado à conta não está ativo.");
         }
+
         if (!gerente.getAtivo()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O gerente não está ativo.");
         }
-        if (!conta.getUsuario().getRole().equals(Role.CLIENTE)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+
+        if (conta.getUsuario().getRole() != Role.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "A operação é permitida apenas para contas de clientes.");
         }
 
         conta.setVersion(req.version());
@@ -101,22 +105,27 @@ public class ContaService {
 
     public void deleteById(Long id, Authentication auth) {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
 
         Conta conta = contaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+        if (conta.getStatus() != StatusConta.ATIVA ||
+                conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.GONE, "A conta ou o usuário vinculado não está ativo.");
         }
-        if (!conta.getUsuario().getRole().equals(Role.CLIENTE)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+
+        if (conta.getUsuario().getRole() != Role.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A operação é permitida apenas para contas de clientes."
+            );
         }
+
         if (!gerente.getAtivo()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O gerente não está ativo.");
         }
+
         if (!conta.getAgencia().equals(gerente.getAgencia())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O gerente não possui permissão para acessar contas de outra agência.");
         }
 
         contaRepository.delete(conta);
@@ -128,15 +137,17 @@ public class ContaService {
 
     public ContaResponse criar(ContaRequest req) {
         Usuario usuario = usuarioRepository.findById(req.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Agencia agencia = agenciaRepository.findById(req.agenciaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 
-        if (!usuario.getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        Agencia agencia = agenciaRepository.findById(req.agenciaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agência não encontrada."));
+
+        if (usuario.getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Não é possível realizar a operação com um usuário inativo.");
         }
-        if (!usuario.getRole().equals(Role.CLIENTE)) {
-            throw new ResponseStatusException(HttpStatus.GONE);
+
+        if (usuario.getRole() != Role.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A operação é permitida apenas para usuários com perfil de cliente.");
         }
 
         Conta entity = ContaMapper.toEntity(req, agencia, usuario);
@@ -145,16 +156,18 @@ public class ContaService {
 
     public ContaResponse atualizar(Long id, ContaRequest request) {
         Conta conta = contaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         Agencia agencia = agenciaRepository.findById(request.agenciaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agência não encontrada."));
 
-        if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        if (conta.getStatus() != StatusConta.ATIVA ||
+                conta.getUsuario().getStatus() != StatusUsuario.ATIVO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Não é possível realizar a operação com uma conta ou usuário inativo.");
         }
-        if (!conta.getUsuario().getRole().equals(Role.CLIENTE)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+
+        if (conta.getUsuario().getRole() != Role.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A operação é permitida apenas para contas de clientes.");
         }
 
         conta.setStatus(request.status());
@@ -169,9 +182,10 @@ public class ContaService {
 
     public void deletar(Long id) {
         Conta conta = contaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!conta.getStatus().equals(StatusConta.ATIVA)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
+
+        if (conta.getStatus() != StatusConta.ATIVA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Não é possível realizar a operação com uma conta inativa.");
         }
 
         contaRepository.delete(conta);
