@@ -28,7 +28,7 @@ public class Boleto {
     private LocalDate vencimento;
 
     @Enumerated(EnumType.STRING)
-    private StatusBoleto status;
+    private StatusBoleto status = StatusBoleto.EMITIDO;
 
     public Boleto() {
     }

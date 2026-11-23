@@ -1,6 +1,5 @@
 package com.bankflow.joao.dto.request;
 
-import com.bankflow.joao.domain.roles.StatusBoleto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
