@@ -13,7 +13,6 @@ public record ContaRequest(
         @NotNull Long agenciaId,
         @NotBlank String numero,
         @NotNull TipoConta tipo,
-        @NotNull @PositiveOrZero BigDecimal saldo,
         @NotNull @PositiveOrZero BigDecimal limite,
         @NotNull StatusConta status,
         @NotNull Long version
