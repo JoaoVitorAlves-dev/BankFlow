@@ -43,7 +43,8 @@ public class ContaService {
     }
 
     public ContaResponse verConta(Authentication auth) {
-        return contaRepository.findByUsuarioEmail(auth.getName());
+        return ContaMapper.toDTO(contaRepository.findByUsuarioEmail(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     public ContaResponse criarGerentePermission(ContaRequest req, Authentication auth) {

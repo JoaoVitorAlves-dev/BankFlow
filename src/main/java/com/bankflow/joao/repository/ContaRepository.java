@@ -7,10 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, Long> {
 
-    ContaResponse findByUsuarioEmail(String email);
+    Optional<Conta> findByUsuarioEmail(String email);
 
     Page<ContaResponse> findAllByAgenciaId(Long id, Pageable pageable);
 

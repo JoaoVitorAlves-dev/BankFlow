@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public record ChavePixRequest(
         @NotNull Long contaId,
         @NotNull TipoChave tipo,
-        @NotBlank String valor,
-        @NotNull Boolean ativa
+        @NotBlank String valor
 ) {
 }
