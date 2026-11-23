@@ -1,9 +1,16 @@
 package com.bankflow.joao.repository;
 
 import com.bankflow.joao.domain.Investimento;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvestimentoRepository extends JpaRepository<Investimento, Long> {
+
+    Page<Investimento> findAllByContaUsuarioEmail(String email, Pageable pageable);
+
+    Page<Investimento> findAllByContaAgenciaId(Long id, Pageable pageable);
+
 }
