@@ -38,13 +38,13 @@ public class BoletoService {
 
     public BoletoResponse criarBoletoCliente(BoletoRequest req, Authentication auth) {
         Conta conta = contaRepository.findById(req.contaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrado."));
 
         if (!conta.getUsuario().getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Conflito de dados.");
         }
         if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
         Boleto entity = BoletoMapper.toEntity(req, conta);
@@ -53,13 +53,13 @@ public class BoletoService {
 
     public void deletarBoletoCliente(Long id, Authentication auth) {
         Boleto boleto = boletoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Boleto não encontrado."));
 
         if (!boleto.getConta().getUsuario().getEmail().equals(auth.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar este recurso.");
         }
         if (boleto.getStatus().equals(StatusBoleto.EMITIDO)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto já foi emitido.");
         }
 
         boletoRepository.delete(boleto);
@@ -78,10 +78,10 @@ public class BoletoService {
 
     public BoletoResponse criar(BoletoRequest req) {
         Conta conta = contaRepository.findById(req.contaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!conta.getStatus().equals(StatusConta.ATIVA) || !conta.getUsuario().getStatus().equals(StatusUsuario.ATIVO)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
         Boleto entity = BoletoMapper.toEntity(req, conta);
@@ -90,16 +90,16 @@ public class BoletoService {
 
     public BoletoResponse atualizar(Long id, BoletoRequest req) {
         Boleto boleto = boletoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Boleto não encontrado."));
 
         Conta conta = contaRepository.findById(req.contaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
         if (!boleto.getConta().equals(conta)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto informado não pertence a esta conta.");
         }
         if (!boleto.getConta().getUsuario().getStatus().equals(StatusUsuario.ATIVO) || !boleto.getConta().getStatus().equals(StatusConta.ATIVA)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "Conta ou usuário inativo.");
         }
 
         boleto.setVencimento(req.vencimento());
@@ -111,10 +111,10 @@ public class BoletoService {
 
     public void deletar(Long id) {
         Boleto boleto = boletoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Boleto não encontrado."));
 
         if (boleto.getStatus().equals(StatusBoleto.EMITIDO)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto já foi emitido.");
         }
 
         boletoRepository.delete(boleto);
