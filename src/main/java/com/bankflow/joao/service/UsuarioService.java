@@ -11,7 +11,6 @@ import com.bankflow.joao.dto.response.RefreshTokenResponse;
 import com.bankflow.joao.dto.response.TokenResponse;
 import com.bankflow.joao.dto.response.UsuarioResponse;
 import com.bankflow.joao.mapper.UsuarioMapper;
-import com.bankflow.joao.repository.ContaRepository;
 import com.bankflow.joao.repository.GerenteRepository;
 import com.bankflow.joao.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -44,6 +43,7 @@ public class UsuarioService {
         this.gerenteRepository = gerenteRepository;
     }
 
+    @Transactional
     public RefreshTokenResponse refresh(String token) {
         RefreshToken refreshToken = refreshTokenService.validarERotacionar(token);
 
@@ -52,17 +52,20 @@ public class UsuarioService {
         return new RefreshTokenResponse(access, refreshToken.getToken());
     }
 
+    @Transactional
     public Page<UsuarioResponse> visualizar(Pageable pageable) {
         return usuarioRepository.findAll(pageable)
                 .map(UsuarioMapper::toDTO);
     }
 
+    @Transactional
     public UsuarioResponse verUsuario(Authentication auth) {
         Usuario usuario = usuarioRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado."));
         return UsuarioMapper.toDTO(usuario);
     }
 
+    @Transactional
     public Page<UsuarioResponse> verUsuarioAgencia(Pageable pageable, Authentication auth) {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
