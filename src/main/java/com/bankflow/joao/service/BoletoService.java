@@ -67,7 +67,7 @@ public class BoletoService {
 
     public Page<BoletoResponse> listarGerente(Authentication auth, Pageable pageable) {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
 
         return boletoRepository.findAllByContaAgenciaId(gerente.getAgencia().getId(), pageable).map(BoletoMapper::toDTO);
     }
