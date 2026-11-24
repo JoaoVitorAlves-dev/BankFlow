@@ -11,6 +11,8 @@ import com.bankflow.joao.dto.response.TokenResponse;
 import com.bankflow.joao.dto.response.UsuarioResponse;
 import com.bankflow.joao.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,6 +45,10 @@ public class UsuarioService {
 
         return new RefreshTokenResponse(access, refreshToken.getToken());
     }
+
+//    public Page<UsuarioResponse> visualizar(Pageable pageable) {
+//        usuarioRepository.findAll(pageable)
+//    }
 
     @Transactional
     public UsuarioResponse registrar(RegisterRequest req) {
