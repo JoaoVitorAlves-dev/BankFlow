@@ -4,6 +4,9 @@ import com.bankflow.joao.domain.roles.Role;
 import com.bankflow.joao.domain.roles.StatusUsuario;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "tb_usuarios")
 public class Usuario {
@@ -29,6 +32,9 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     private StatusUsuario status = StatusUsuario.ATIVO;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Conta> contas = new ArrayList<>();
 
     public Usuario() {
     }
@@ -87,5 +93,13 @@ public class Usuario {
 
     public void setStatus(StatusUsuario status) {
         this.status = status;
+    }
+
+    public List<Conta> getContas() {
+        return contas;
+    }
+
+    public void setContas(List<Conta> contas) {
+        this.contas = contas;
     }
 }

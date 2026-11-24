@@ -1,5 +1,6 @@
 package com.bankflow.joao.service;
 
+import com.bankflow.joao.domain.Gerente;
 import com.bankflow.joao.domain.RefreshToken;
 import com.bankflow.joao.domain.Usuario;
 import com.bankflow.joao.domain.roles.Role;
@@ -9,6 +10,9 @@ import com.bankflow.joao.dto.request.RegisterRequest;
 import com.bankflow.joao.dto.response.RefreshTokenResponse;
 import com.bankflow.joao.dto.response.TokenResponse;
 import com.bankflow.joao.dto.response.UsuarioResponse;
+import com.bankflow.joao.mapper.UsuarioMapper;
+import com.bankflow.joao.repository.ContaRepository;
+import com.bankflow.joao.repository.GerenteRepository;
 import com.bankflow.joao.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -29,13 +33,15 @@ public class UsuarioService {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final GerenteRepository gerenteRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, RefreshTokenService refreshTokenService, TokenService tokenService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, RefreshTokenService refreshTokenService, TokenService tokenService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, GerenteRepository gerenteRepository) {
         this.usuarioRepository = usuarioRepository;
         this.refreshTokenService = refreshTokenService;
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.gerenteRepository = gerenteRepository;
     }
 
     public RefreshTokenResponse refresh(String token) {
@@ -46,9 +52,24 @@ public class UsuarioService {
         return new RefreshTokenResponse(access, refreshToken.getToken());
     }
 
-//    public Page<UsuarioResponse> visualizar(Pageable pageable) {
-//        usuarioRepository.findAll(pageable)
-//    }
+    public Page<UsuarioResponse> visualizar(Pageable pageable) {
+        return usuarioRepository.findAll(pageable)
+                .map(UsuarioMapper::toDTO);
+    }
+
+    public UsuarioResponse verUsuario(Authentication auth) {
+        Usuario usuario = usuarioRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado."));
+        return UsuarioMapper.toDTO(usuario);
+    }
+
+    public Page<UsuarioResponse> verUsuarioAgencia(Pageable pageable, Authentication auth) {
+        Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
+
+        return usuarioRepository.findDistinctByAgenciaId(gerente.getAgencia().getId(), pageable)
+                .map(UsuarioMapper::toDTO);
+    }
 
     @Transactional
     public UsuarioResponse registrar(RegisterRequest req) {
