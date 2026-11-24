@@ -14,7 +14,6 @@ public class TransacaoMapper {
         transacao.setChaveDestino(req.chaveDestino());
         transacao.setDestino(destino);
         transacao.setIdempotencykey(req.idempotencyKey());
-        transacao.setChaveDestino(req.chaveDestino());
         transacao.setOrigem(origem);
         transacao.setStatus(req.status());
         transacao.setTipo(req.tipo());

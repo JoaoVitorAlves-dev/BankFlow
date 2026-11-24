@@ -30,7 +30,7 @@ public class Transacao {
     private BigDecimal valor = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    private StatusTransacao status;
+    private StatusTransacao status = StatusTransacao.PENDENTE;
 
     @Column(nullable = false, name = "chave_destino")
     private String chaveDestino;
