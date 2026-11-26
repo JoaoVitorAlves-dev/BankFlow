@@ -10,6 +10,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +45,48 @@ public class AgenciaServiceTest {
         assertEquals("Balneario", salva.getCidade());
         assertEquals("89520-000", salva.getCodigo());
         assertEquals("Santa Catarina", salva.getEstado());
+    }
+
+    @Test
+    void atualizarAgencia() {
+        Agencia existente = new Agencia();
+        existente.setNome("Agencia Antiga");
+
+        AgenciaRequest agencia = new AgenciaRequest("1021102-121", "Agencia Nova", "Angra", "Rio de Janeiro");
+
+        when(agenciaRepository.findById(1L)).thenReturn(Optional.of(existente));
+        when(agenciaRepository.save(any(Agencia.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        agenciaService.atualizar(1L, agencia);
+
+        verify(agenciaRepository).save(agenciaCaptor.capture());
+        Agencia salva = agenciaCaptor.getValue();
+
+        assertEquals("Agencia Nova", salva.getNome());
+        assertEquals("Angra", salva.getCidade());
+    }
+
+    @Test
+    void atualizarAgencia_inexistente() {
+        AgenciaRequest agencia = new AgenciaRequest("1021102-121", "Agencia nova", "Angra", "Rio de Janeiro");
+
+        when(agenciaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> agenciaService.atualizar(99L, agencia));
+
+        verify(agenciaRepository, never()).save(any());
+    }
+
+    @Test
+    void deletarAgencia() {
+        Agencia agencia = new Agencia();
+        agencia.setNome("Agencia");
+
+        when(agenciaRepository.findById(1L)).thenReturn(Optional.of(agencia));
+
+        agenciaService.deletar(1L);
+
+        verify(agenciaRepository).delete(agencia);
     }
 
 }
