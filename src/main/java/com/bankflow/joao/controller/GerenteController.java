@@ -41,7 +41,7 @@ public class GerenteController {
         return ResponseEntity.ok(gerenteService.atualizar(id, req));
     }
 
-    @DeleteMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<Void> desativar(@PathVariable Long id) {
         gerenteService.desativar(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

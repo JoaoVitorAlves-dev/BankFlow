@@ -60,7 +60,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.atualizar(id, req, auth));
     }
 
-    @DeleteMapping("/usuarios/{id}")
+    @PatchMapping("/usuarios/{id}")
     public ResponseEntity<Void> encerrar(@PathVariable Long id, Authentication auth) {
         usuarioService.encerrar(id, auth);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
