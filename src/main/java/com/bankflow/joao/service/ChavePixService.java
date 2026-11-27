@@ -127,7 +127,10 @@ public class ChavePixService {
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
-        if (!chavePix.getConta().getUsuario().getEmail().equals(auth.getName())) {
+        if (!chavePix.getConta().equals(conta)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Conta vinculada alterada.");
+        }
+        if (!chavePix.getConta().getUsuario().getEmail().equals(auth.getName()) || !conta.getUsuario().getEmail().equals(auth.getName())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta chave Pix.");
         }
         if (chavePix.getConta().getStatus() != StatusConta.ATIVA || chavePix.getConta().getUsuario().getStatus() != StatusUsuario.ATIVO
