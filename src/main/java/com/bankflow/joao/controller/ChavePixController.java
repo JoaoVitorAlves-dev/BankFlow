@@ -1,6 +1,5 @@
 package com.bankflow.joao.controller;
 
-import com.bankflow.joao.domain.ChavePix;
 import com.bankflow.joao.dto.request.ChavePixRequest;
 import com.bankflow.joao.dto.response.ChavePixResponse;
 import com.bankflow.joao.service.ChavePixService;

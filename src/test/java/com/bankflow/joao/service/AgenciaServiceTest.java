@@ -2,6 +2,7 @@ package com.bankflow.joao.service;
 
 import com.bankflow.joao.domain.Agencia;
 import com.bankflow.joao.dto.request.AgenciaRequest;
+import com.bankflow.joao.dto.response.AgenciaResponse;
 import com.bankflow.joao.repository.AgenciaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,8 +11,14 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.print.Pageable;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -28,6 +35,10 @@ public class AgenciaServiceTest {
 
     @Captor
     private ArgumentCaptor<Agencia> agenciaCaptor;
+
+    @Test
+    void listarAgencias() {
+    }
 
     @Test
     void criarAgencia() {
