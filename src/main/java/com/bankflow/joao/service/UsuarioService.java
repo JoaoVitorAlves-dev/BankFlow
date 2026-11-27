@@ -75,7 +75,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponse registrarUsuarioAgencia(RegisterRequest req, Authentication auth) {
+    public UsuarioResponse registrarUsuarioGerente(RegisterRequest req, Authentication auth) {
         if (usuarioRepository.existsByEmail(req.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado.");
         }
