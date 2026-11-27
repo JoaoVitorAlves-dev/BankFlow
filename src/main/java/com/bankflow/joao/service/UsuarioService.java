@@ -47,7 +47,7 @@ public class UsuarioService {
     public RefreshTokenResponse refresh(String token) {
         RefreshToken refreshToken = refreshTokenService.validarERotacionar(token);
 
-        String access = tokenService.gerarToken(refreshToken.getToken());
+        String access = tokenService.gerarToken(refreshToken.getUsuario().getEmail());
 
         return new RefreshTokenResponse(access, refreshToken.getToken());
     }
