@@ -58,7 +58,7 @@ public class InvestimentoController {
     }
 
     @DeleteMapping("/meus/{id}")
-    public ResponseEntity<Void> deleteInvestimentoCLiente(@PathVariable Long id, Authentication auth) {
+    public ResponseEntity<Void> deleteInvestimentoCliente(@PathVariable Long id, Authentication auth) {
         investimentoService.deleteInvestimentoCliente(id, auth);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
