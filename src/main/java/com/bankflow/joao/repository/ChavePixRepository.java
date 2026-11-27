@@ -6,11 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ChavePixRepository extends JpaRepository<ChavePix, Long> {
 
     Page<ChavePix> findAllByContaUsuarioEmail(String email, Pageable pageable);
 
     Page<ChavePix> findAllByContaAgenciaId(Long id, Pageable pageable);
+
+    Optional<ChavePix> findByIdAndContaUsuarioEmail(Long id, String email);
 
 }

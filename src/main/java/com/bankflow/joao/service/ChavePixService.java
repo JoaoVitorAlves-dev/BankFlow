@@ -11,6 +11,8 @@ import com.bankflow.joao.mapper.ChavePixMapper;
 import com.bankflow.joao.repository.ChavePixRepository;
 import com.bankflow.joao.repository.ContaRepository;
 import com.bankflow.joao.repository.GerenteRepository;
+import com.bankflow.joao.service.qrcode.QrCodeService;
+import org.hibernate.annotations.NotFound;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,17 +20,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+
 @Service
 public class ChavePixService {
 
     private final ChavePixRepository chavePixRepository;
     private final ContaRepository contaRepository;
     private final GerenteRepository gerenteRepository;
+    private final QrCodeService qrCodeService;
 
-    public ChavePixService(ChavePixRepository chavePixRepository, ContaRepository contaRepository, GerenteRepository gerenteRepository) {
+    public ChavePixService(ChavePixRepository chavePixRepository, ContaRepository contaRepository, GerenteRepository gerenteRepository, QrCodeService qrCodeService) {
         this.chavePixRepository = chavePixRepository;
         this.contaRepository = contaRepository;
         this.gerenteRepository = gerenteRepository;
+        this.qrCodeService = qrCodeService;
     }
 
     public Page<ChavePixResponse> visualizar(Pageable pageable) {
