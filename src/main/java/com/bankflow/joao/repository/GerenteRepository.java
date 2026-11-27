@@ -9,6 +9,8 @@ import java.util.Optional;
 @Repository
 public interface GerenteRepository extends JpaRepository<Gerente, Long> {
 
+    Boolean existsByUsuarioEmail(String email);
+
     Optional<Gerente> findByUsuarioEmail(String email);
 
 }

@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(HttpMethod.POST, "/usuarios/auth/registrar", "/usuarios/auth/refresh/", "/usuarios/auth/logar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuarios//auth/registrar/gerente").authenticated()
                         .requestMatchers(HttpMethod.GET, "/usuarios/me").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/usuarios/{id}", "/usuarios/{id}").authenticated()
                         .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")

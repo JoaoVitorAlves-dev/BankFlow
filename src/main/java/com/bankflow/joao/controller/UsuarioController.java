@@ -50,6 +50,11 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.registrar(req));
     }
 
+    @PostMapping("/auth/registrar/gerente")
+    public ResponseEntity<UsuarioResponse> registrarUsuarioGerente(@RequestBody @Valid RegisterRequest req, Authentication auth) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.registrarUsuarioGerente(req, auth));
+    }
+
     @PostMapping("/auth/logar")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest req) {
         return ResponseEntity.ok(usuarioService.login(req));

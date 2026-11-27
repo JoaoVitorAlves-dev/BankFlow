@@ -75,6 +75,27 @@ public class UsuarioService {
     }
 
     @Transactional
+    public UsuarioResponse registrarUsuarioGerente(RegisterRequest req, Authentication auth) {
+        if (usuarioRepository.existsByEmail(req.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado.");
+        }
+        if (!gerenteRepository.existsByUsuarioEmail(auth.getName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Gerente não existe.");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(req.nome());
+
+        usuario.setCpf(req.cpf());
+        usuario.setEmail(req.email());
+        usuario.setPassword(passwordEncoder.encode(req.password()));
+        usuario.setRole(Role.CLIENTE);
+        usuarioRepository.save(usuario);
+
+        return new UsuarioResponse(usuario.getNome(), usuario.getCpf(), usuario.getEmail(), usuario.getStatus());
+    }
+
+    @Transactional
     public UsuarioResponse registrar(RegisterRequest req) {
         if (usuarioRepository.existsByEmail(req.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado.");
