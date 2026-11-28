@@ -14,7 +14,6 @@ API REST de um sistema bancário desenvolvido com Java e Spring Boot. Contempla 
 - Micrometer e Prometheus
 - Springdoc OpenAPI
 - Hibernate Envers e ShedLock
-- Testcontainers
 
 ## Requisitos
 
@@ -111,7 +110,7 @@ As listagens utilizam paginação do Spring Data, com parâmetros como `page`, `
 
 ## Observabilidade e documentação
 
-O projeto inclui Actuator, Micrometer e Prometheus, além de Springdoc OpenAPI para documentação da API. Também utiliza Hibernate Envers para auditoria e ShedLock para coordenação de tarefas agendadas.
+O projeto inclui Actuator, Micrometer e Prometheus, Também utiliza Hibernate Envers para auditoria e ShedLock para coordenação de tarefas agendadas.
 
 ## Estrutura
 
