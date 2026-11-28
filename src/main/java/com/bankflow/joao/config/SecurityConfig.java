@@ -35,10 +35,10 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(HttpMethod.POST, "/usuarios/auth/registrar", "/usuarios/auth/refresh/", "/usuarios/auth/logar").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/usuarios//auth/registrar/gerente").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/usuarios/auth/registrar", "/usuarios/auth/refresh", "/usuarios/auth/logar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuarios/auth/registrar/gerente").authenticated()
                         .requestMatchers(HttpMethod.GET, "/usuarios/me").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/usuarios/{id}", "/usuarios/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/usuarios/{id}", "/usuarios/{id}/encerrar").authenticated()
                         .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/usuarios/agencia").authenticated()
 

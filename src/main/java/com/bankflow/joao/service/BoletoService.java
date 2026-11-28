@@ -69,6 +69,10 @@ public class BoletoService {
         Gerente gerente = gerenteRepository.findByUsuarioEmail(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gerente não encontrado."));
 
+        if (!gerente.getAtivo()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Gerente desativado.");
+        }
+
         return boletoRepository.findAllByContaAgenciaId(gerente.getAgencia().getId(), pageable).map(BoletoMapper::toDTO);
     }
 
@@ -95,6 +99,9 @@ public class BoletoService {
         Conta conta = contaRepository.findById(req.contaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
 
+        if (boleto.getStatus() != StatusBoleto.EMITIDO) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto não está com status emitido.");
+        }
         if (!boleto.getConta().equals(conta)) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, "O boleto informado não pertence a esta conta.");
         }

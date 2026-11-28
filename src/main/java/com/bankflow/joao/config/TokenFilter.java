@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
+@Slf4j
 @Component
 public class TokenFilter extends OncePerRequestFilter {
 
@@ -43,8 +44,9 @@ public class TokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (IllegalArgumentException | JwtException e) {
-            Logger.getLogger(e.getMessage());
+            log.warn("Token JWT inválido: {}", e.getMessage());
         }
+        filterChain.doFilter(request, response);
     }
 
     private String extrairToken(HttpServletRequest request) {
